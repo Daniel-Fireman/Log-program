@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Incident Log</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="log.js" defer></script>
+  </head>
+
+  <body>
+    <nav class="navbar" aria-label="Main navigation">
+      <a class="brand" href="index.html">Junior Døgnøvelse</a>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="log.html">Log</a></li>
+      </ul>
+    </nav>
+
+    <main>
+      <h1>Incident Log</h1>
+      <p>Record and review incidents below.</p>
+
+      <form id="incident-form">
+        <label for="incident-title">Incident title</label>
+        <input
+          type="text"
+          id="incident-title"
+          placeholder="Enter incident title"
+          required
+        />
+
+        <label for="incident-message">Incident message</label>
+        <textarea
+          id="incident-message"
+          placeholder="Describe what happened..."
+          rows="5"
+          required
+        ></textarea>
+
+        <button type="submit">Add incident</button>
+      </form>
+
+      <section id="incident-list">
+        <h2>Previous incidents</h2>
+        <p id="empty-message">No incidents have been recorded yet.</p>
+      </section>
+    </main>
+  </body>
+</html>
