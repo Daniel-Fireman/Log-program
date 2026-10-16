@@ -1,16 +1,20 @@
+```html
 <!doctype html>
-<html lang="en">
+<html lang="da">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>Incident Log</title>
+
     <link rel="stylesheet" href="styles.css" />
     <script src="log.js" defer></script>
   </head>
 
   <body>
-    <nav class="navbar" aria-label="Main navigation">
-      <a class="brand" href="index.html">Junior Døgnøvelse</a>
+    <nav class="navbar" aria-label="Hovednavigation">
+      <a class="brand" href="index.html">Junior døgnøvelse</a>
+
       <ul>
         <li><a href="index.html">Home</a></li>
         <li><a href="log.html">Log</a></li>
@@ -19,32 +23,52 @@
 
     <main>
       <h1>Incident Log</h1>
-      <p>Record and review incidents below.</p>
+      <p>Registrer og gennemgå hændelser her.</p>
 
       <form id="incident-form">
-        <label for="incident-title">Incident title</label>
+        <label for="incident-first-message">Førstemelding</label>
         <input
           type="text"
-          id="incident-title"
-          placeholder="Enter incident title"
-          required
+          id="incident-first-message"
+          placeholder="Beskriv den første melding..."
         />
 
-        <label for="incident-message">Incident message</label>
+        <label for="incident-address">Adresse</label>
+        <input
+          type="text"
+          id="incident-address"
+          placeholder="Indtast adresse"
+        />
+
+        <label for="incident-phone">Anmelder tlf.</label>
+        <input
+          type="tel"
+          id="incident-phone"
+          placeholder="Indtast telefonnummer"
+        />
+
+        <label for="incident-vehicles">Køretøjer</label>
+        <input
+          type="text"
+          id="incident-vehicles"
+          placeholder="Indtast relevante køretøjer..."
+        />
+
+        <label for="incident-comment">Kommentar</label>
         <textarea
-          id="incident-message"
-          placeholder="Describe what happened..."
-          rows="5"
-          required
+          id="incident-comment"
+          placeholder="Skriv en kommentar..."
+          rows="3"
         ></textarea>
 
-        <button type="submit">Add incident</button>
+        <button type="submit">Opret incident</button>
       </form>
 
       <section id="incident-list">
-        <h2>Previous incidents</h2>
-        <p id="empty-message">No incidents have been recorded yet.</p>
+        <h2>Tidligere incidents</h2>
+        <p id="empty-message">Der er endnu ikke oprettet nogen incidents.</p>
       </section>
     </main>
   </body>
 </html>
+```
