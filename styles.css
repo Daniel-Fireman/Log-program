@@ -698,3 +698,100 @@ p {
   line-height: normal;
   text-align: center;
 }
+
+/* =========================
+   ABA – Anlægsoversigt
+   ========================= */
+
+.aba-page {
+  max-width: 720px;
+  text-align: center;
+}
+
+.aba-search-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 35px;
+  padding: 24px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px #17255414;
+  text-align: left;
+}
+
+.aba-search-section label {
+  font-weight: bold;
+  color: #374151;
+}
+
+.aba-search-section input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font: inherit;
+}
+
+.aba-hint {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.aba-result {
+  margin-top: 24px;
+  padding: 24px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px #17255414;
+}
+
+.aba-result h2 {
+  margin-top: 0;
+  color: #2563eb;
+}
+
+.aba-status-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 20px 0;
+}
+
+.aba-status-in-service-operation {
+  color: #15803d;
+}
+
+.aba-status-maintenance {
+  color: #b45309;
+}
+
+#aba-toggle-status {
+  width: 100%;
+  padding: 14px 20px;
+  border: none;
+  border-radius: 6px;
+  background: #2563eb;
+  color: #fff;
+  font: inherit;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#aba-toggle-status:hover {
+  background: #1d4ed8;
+}
+
+.aba-message {
+  margin-top: 20px;
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .aba-search-section,
+  .aba-result {
+    padding: 16px;
+  }
+}
