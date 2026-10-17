@@ -698,3 +698,216 @@ p {
   line-height: normal;
   text-align: center;
 }
+
+/* =========================
+   ABA – Anlægsoversigt
+   ========================= */
+
+.aba-page {
+  max-width: 720px;
+  text-align: center;
+}
+
+.aba-search-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 35px;
+  padding: 24px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px #17255414;
+  text-align: left;
+}
+
+.aba-search-section label {
+  font-weight: bold;
+  color: #374151;
+}
+
+.aba-search-section input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font: inherit;
+}
+
+.aba-hint {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.aba-result {
+  margin-top: 24px;
+  padding: 24px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px #17255414;
+}
+
+.aba-result h2 {
+  margin-top: 0;
+  color: #2563eb;
+}
+
+.aba-status-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 20px 0;
+}
+
+.aba-status-in-service-operation {
+  color: #15803d;
+}
+
+.aba-status-maintenance {
+  color: #b45309;
+}
+
+#aba-toggle-status {
+  width: 100%;
+  padding: 14px 20px;
+  border: none;
+  border-radius: 6px;
+  background: #2563eb;
+  color: #fff;
+  font: inherit;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#aba-toggle-status:hover {
+  background: #1d4ed8;
+}
+
+.aba-message {
+  margin-top: 20px;
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .aba-search-section,
+  .aba-result {
+    padding: 16px;
+  }
+}
+
+/* ABA: søgeknap og serviceliste */
+
+#aba-search-button,
+.aba-list-button {
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 6px;
+  background: #2563eb;
+  color: #fff;
+  font: inherit;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#aba-search-button:hover,
+.aba-list-button:hover {
+  background: #1d4ed8;
+}
+
+.aba-list-button {
+  margin-top: 16px;
+}
+
+.aba-service-list {
+  margin-top: 24px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px #17255414;
+  text-align: left;
+}
+
+.aba-service-list h2 {
+  margin-top: 0;
+  color: #2563eb;
+}
+
+.aba-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+#service-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#service-table th,
+#service-table td {
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  text-align: left;
+}
+
+#service-table th {
+  background: #eff6ff;
+  color: #1e40af;
+}
+
+.aba-service-row {
+  cursor: pointer;
+}
+
+.aba-service-row:hover,
+.aba-service-row:focus {
+  background: #eff6ff;
+  outline: 2px solid #93c5fd;
+  outline-offset: -2px;
+}
+
+.aba-status-maintenance {
+  color: #b45309;
+}
+
+.aba-status-in-service-operation {
+  color: #15803d;
+}
+
+#aba-phone-display {
+  overflow-wrap: anywhere;
+}
+
+/* ABA: lokation og servicetidspunkt */
+
+#aba-location {
+  margin-top: -8px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+#aba-phone-display,
+#aba-service-time-display {
+  overflow-wrap: anywhere;
+}
+
+#aba-toggle-status {
+  margin-top: 8px;
+}
+
+#show-service-list {
+  margin-top: 20px;
+}
+
+.aba-service-list {
+  margin-top: 20px;
+}
+
+.aba-table-wrapper {
+  overflow-x: auto;
+}
+
+#service-table {
+  min-width: 750px;
+}
