@@ -1,5 +1,7 @@
 const alarmStorageKey = "tyverialarm-data";
 const alarmLockKey = "tyverialarm-lock";
+const closedAlarmStorageKey = "tyverialarm-log";
+const alarmSoundKey = "tyverialarm-lyd";
 
 const alarmAddresses = [
   "Banegårdspladsen 1, 8000 Aarhus C",
@@ -38,7 +40,7 @@ let alarmTimer = null;
 
 // Opret en tilfældig ventetid mellem 5 og 10 minutter.
 function getNextAlarmTime() {
-  const minutes = Math.floor(Math.random() * 6) + 5;
+  const minutes = 0.6;
   return Date.now() + minutes * 60 * 1000;
 }
 
@@ -74,7 +76,141 @@ function saveAlarmData(data) {
 // Opret alarmområdet øverst til venstre.
 
 const alarmMinimizedKey = "tyverialarm-minimized";
+// Konvertér et tidspunkt til formatet for datetime-local.
+function toDateTimeLocal(timestamp) {
+  if (!timestamp) return "";
 
+  const date = new Date(timestamp);
+
+  if (Number.isNaN(date.getTime())) return "";
+
+  const pad = (number) => String(number).padStart(2, "0");
+
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+// Vis et tidspunkt på dansk.
+function formatDateTime(value) {
+  if (!value) return "Ikke angivet";
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) return "Ikke angivet";
+
+  return date.toLocaleString("da-DK");
+}
+
+// Hent afsluttede alarmer.
+function loadClosedAlarms() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(closedAlarmStorageKey));
+
+    return Array.isArray(saved) ? saved : [];
+  } catch (error) {
+    console.error("Kunne ikke indlæse tyverialarm-log:", error);
+    return [];
+  }
+}
+
+// Gem afsluttede alarmer.
+function saveClosedAlarms(alarms) {
+  try {
+    localStorage.setItem(closedAlarmStorageKey, JSON.stringify(alarms));
+
+    return true;
+  } catch (error) {
+    console.error("Kunne ikke gemme tyverialarm-log:", error);
+    return false;
+  }
+}
+
+// Gem ændringer til en aktiv alarm.
+function updateAlarm(alarmId, changes) {
+  const data = loadAlarmData();
+  const alarm = data.alarms.find((item) => item.id === alarmId);
+
+  if (!alarm) return;
+
+  Object.assign(alarm, changes);
+  saveAlarmData(data);
+}
+
+// Afspil en kort pling-lyd.
+let alarmAudioContext = null;
+
+function playPling() {
+  if (localStorage.getItem(alarmSoundKey) !== "true") return;
+
+  try {
+    if (!alarmAudioContext) {
+      alarmAudioContext = new (
+        window.AudioContext || window.webkitAudioContext
+      )();
+    }
+
+    if (alarmAudioContext.state !== "running") return;
+
+    const oscillator = alarmAudioContext.createOscillator();
+    const gain = alarmAudioContext.createGain();
+
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(1046.5, alarmAudioContext.currentTime);
+    oscillator.frequency.exponentialRampToValueAtTime(
+      1568,
+      alarmAudioContext.currentTime + 0.12,
+    );
+
+    gain.gain.setValueAtTime(0.0001, alarmAudioContext.currentTime);
+    gain.gain.exponentialRampToValueAtTime(
+      0.25,
+      alarmAudioContext.currentTime + 0.015,
+    );
+    gain.gain.exponentialRampToValueAtTime(
+      0.0001,
+      alarmAudioContext.currentTime + 0.65,
+    );
+
+    oscillator.connect(gain);
+    gain.connect(alarmAudioContext.destination);
+
+    oscillator.start();
+    oscillator.stop(alarmAudioContext.currentTime + 0.65);
+  } catch (error) {
+    console.error("Kunne ikke afspille alarmlyd:", error);
+  }
+}
+
+// Aktivér lyden efter en brugerhandling.
+async function enableAlarmSound() {
+  try {
+    if (!alarmAudioContext) {
+      alarmAudioContext = new (
+        window.AudioContext || window.webkitAudioContext
+      )();
+    }
+
+    await alarmAudioContext.resume();
+
+    localStorage.setItem(alarmSoundKey, "true");
+    updateSoundButton();
+
+    // Afspil en testlyd.
+    playPling();
+  } catch (error) {
+    console.error("Kunne ikke aktivere alarmlyd:", error);
+  }
+}
+
+function updateSoundButton() {
+  const button = document.getElementById("tyverialarm-sound");
+
+  if (!button) return;
+
+  const enabled = localStorage.getItem(alarmSoundKey) === "true";
+
+  button.textContent = enabled ? "Lyd til" : "Aktivér lyd";
+  button.setAttribute("aria-pressed", String(enabled));
+}
 function createAlarmContainer() {
   let container = document.getElementById("tyverialarm-container");
 
@@ -92,9 +228,23 @@ function createAlarmContainer() {
   const heading = document.createElement("h2");
   heading.textContent = "Aktive tyverialarmer";
 
+  const soundButton = document.createElement("button");
+  soundButton.id = "tyverialarm-sound";
+  soundButton.type = "button";
+  soundButton.addEventListener("click", async () => {
+    if (localStorage.getItem(alarmSoundKey) === "true") {
+      localStorage.setItem(alarmSoundKey, "false");
+      updateSoundButton();
+    } else {
+      await enableAlarmSound();
+    }
+  });
+
   const minimizeButton = document.createElement("button");
   minimizeButton.id = "tyverialarm-minimize";
   minimizeButton.type = "button";
+
+  updateSoundButton();
 
   const list = document.createElement("div");
   list.id = "tyverialarm-list";
@@ -119,7 +269,7 @@ function createAlarmContainer() {
     localStorage.setItem(alarmMinimizedKey, String(isMinimized));
   });
 
-  header.append(heading, minimizeButton);
+  header.append(heading, soundButton, minimizeButton);
   container.append(header, list);
   document.body.appendChild(container);
 
@@ -148,6 +298,37 @@ function renderAlarms() {
 
     const time = document.createElement("p");
     time.textContent = `Modtaget: ${formatAlarmTime(alarm.createdAt)}`;
+    // Tidspunkt for videregivelse.
+    const forwardedLabel = document.createElement("label");
+    forwardedLabel.textContent = "Givet videre:";
+    forwardedLabel.htmlFor = `forwarded-${alarm.id}`;
+
+    const forwardedInput = document.createElement("input");
+    forwardedInput.type = "datetime-local";
+    forwardedInput.id = `forwarded-${alarm.id}`;
+    forwardedInput.value = alarm.forwardedAt || "";
+    forwardedInput.addEventListener("change", () => {
+      updateAlarm(alarm.id, {
+        forwardedAt: forwardedInput.value,
+      });
+    });
+
+    // Tilbagemelding.
+    const feedbackLabel = document.createElement("label");
+    feedbackLabel.textContent = "Tilbagemelding:";
+    feedbackLabel.htmlFor = `feedback-${alarm.id}`;
+
+    const feedbackInput = document.createElement("textarea");
+    feedbackInput.id = `feedback-${alarm.id}`;
+    feedbackInput.rows = 3;
+    feedbackInput.placeholder = "Skriv tilbagemelding på alarmen...";
+    feedbackInput.value = alarm.feedback || "";
+
+    feedbackInput.addEventListener("input", () => {
+      updateAlarm(alarm.id, {
+        feedback: feedbackInput.value,
+      });
+    });
 
     const finishButton = document.createElement("button");
     finishButton.type = "button";
@@ -165,7 +346,16 @@ function renderAlarms() {
       finishAlarm(alarm.id);
     });
 
-    card.append(title, address, time, finishButton);
+    card.append(
+      title,
+      address,
+      time,
+      forwardedLabel,
+      forwardedInput,
+      feedbackLabel,
+      feedbackInput,
+      finishButton,
+    );
     list.appendChild(card);
   });
 }
@@ -178,11 +368,28 @@ function formatAlarmTime(timestamp) {
   });
 }
 
-// Afslut den valgte alarm.
 function finishAlarm(alarmId) {
   const data = loadAlarmData();
+  const alarm = data.alarms.find((item) => item.id === alarmId);
 
-  data.alarms = data.alarms.filter((alarm) => alarm.id !== alarmId);
+  if (!alarm) return;
+
+  const closedAlarm = {
+    id: alarm.id,
+    address: alarm.address,
+    createdAt: alarm.createdAt,
+    forwardedAt: alarm.forwardedAt || "",
+    feedback: alarm.feedback || "",
+    finishedAt: Date.now(),
+  };
+
+  const closedAlarms = loadClosedAlarms();
+  closedAlarms.unshift(closedAlarm);
+
+  // Gem i loggen, før alarmen fjernes fra de aktive.
+  if (!saveClosedAlarms(closedAlarms)) return;
+
+  data.alarms = data.alarms.filter((item) => item.id !== alarmId);
 
   if (saveAlarmData(data)) {
     renderAlarms();
@@ -221,12 +428,15 @@ function tryCreateAlarm() {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
       address,
       createdAt: Date.now(),
+      forwardedAt: "",
+      feedback: "",
     });
 
     data.nextAt = getNextAlarmTime();
 
     if (saveAlarmData(data)) {
       renderAlarms();
+      playPling();
     }
   } catch (error) {
     console.error("Kunne ikke oprette tyverialarm:", error);

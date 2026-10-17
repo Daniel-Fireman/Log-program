@@ -1020,3 +1020,48 @@ p {
 #tyverialarm-container.minimized #tyverialarm-list {
   display: none;
 }
+#tyverialarm-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+#tyverialarm-header h2 {
+  flex: 1;
+  min-width: 150px;
+}
+
+#tyverialarm-container label,
+#tyverialarm-container input,
+#tyverialarm-container textarea {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#tyverialarm-container label {
+  margin-top: 10px;
+  margin-bottom: 4px;
+}
+
+#tyverialarm-container input,
+#tyverialarm-container textarea {
+  padding: 8px;
+  font: inherit;
+}
+
+.tyv-log-card {
+  margin: 16px 0;
+  padding: 16px;
+  border: 1px solid #777;
+  border-radius: 8px;
+}
+
+.tyv-log-card h2 {
+  margin-top: 0;
+}
+
+.tyv-log-card p {
+  overflow-wrap: anywhere;
+}
