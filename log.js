@@ -85,6 +85,39 @@ function createTextField(labelText, value = "", multiline = false) {
 
   return { label, input };
 }
+function toDateTimeLocal(dateString) {
+  if (!dateString) {
+    return "";
+  }
+
+  // Håndter datoer gemt i det eksisterende danske format.
+  const match = dateString.match(
+    /^(\d{1,2})-(\d{1,2})-(\d{4}),?\s+(\d{1,2}):(\d{2})(?::(\d{2}))?$/,
+  );
+
+  if (match) {
+    const [, day, month, year, hours, minutes] = match;
+
+    return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}T${hours.padStart(2, "0")}:${minutes.padStart(2, "0")}`;
+  }
+
+  // Fallback til andre datoformater.
+  const date = new Date(dateString);
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  const pad = (number) => String(number).padStart(2, "0");
+
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+function formatEditedDateTime(value) {
+  const date = new Date(value);
+
+  return date.toLocaleString("da-DK");
+}
 
 // Create save and cancel buttons.
 function createEditActions(onCancel) {
@@ -126,7 +159,15 @@ function createIncidentEditForm(incident, article) {
     editInputs[field.key] = input;
     editForm.appendChild(label);
   });
+  const dateField = createTextField(
+    "Dato og tidspunkt",
+    toDateTimeLocal(incident.date),
+  );
 
+  dateField.input.type = "datetime-local";
+  dateField.input.required = true;
+
+  editForm.appendChild(dateField.label);
   editForm.appendChild(createEditActions(displayIncidents));
 
   editForm.addEventListener("submit", (event) => {
@@ -135,7 +176,7 @@ function createIncidentEditForm(incident, article) {
     fields.forEach((field) => {
       incident[field.key] = editInputs[field.key].value.trim();
     });
-
+    incident.date = formatEditedDateTime(dateField.input.value);
     saveIncidents();
     displayIncidents();
   });
@@ -155,7 +196,15 @@ function createCommentEditForm(comment) {
 
   const messageField = createTextField("Kommentar", comment.message, true);
 
-  editForm.append(titleField.label, messageField.label);
+  const dateField = createTextField(
+    "Dato og tidspunkt",
+    toDateTimeLocal(comment.date),
+  );
+
+  dateField.input.type = "datetime-local";
+  dateField.input.required = true;
+
+  editForm.append(titleField.label, messageField.label, dateField.label);
   editForm.appendChild(createEditActions(displayIncidents));
 
   editForm.addEventListener("submit", (event) => {
@@ -171,6 +220,7 @@ function createCommentEditForm(comment) {
 
     comment.title = title;
     comment.message = message;
+    comment.date = formatEditedDateTime(dateField.input.value);
 
     saveIncidents();
     displayIncidents();
