@@ -3,9 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <title>ABA – Anlægsoversigt</title>
-
     <link rel="stylesheet" href="styles.css" />
     <script src="aba.js" defer></script>
   </head>
@@ -13,11 +11,10 @@
   <body>
     <nav class="navbar" aria-label="Hovednavigation">
       <a class="brand" href="index.html">Junior døgnøvelse</a>
-
       <ul>
         <li><a href="index.html">Home</a></li>
-        <li><a href="log.html">Log</a></li>
         <li><a href="odin.html">Odin</a></li>
+        <li><a href="log.html">Log</a></li>
         <li><a href="aba.html">ABA</a></li>
       </ul>
     </nav>
@@ -26,28 +23,57 @@
       <h1>ABA</h1>
       <p>Søg efter et anlæg, og se eller ændr dets status.</p>
 
-      <section class="aba-search-section">
+      <form id="aba-search-form" class="aba-search-section">
         <label for="aba-search">Søg efter anlæg</label>
-
         <input
           type="search"
           id="aba-search"
           placeholder="Indtast f.eks. ABA17"
           autocomplete="off"
         />
-
-        <p class="aba-hint">Søg efter et anlæg fra ABA1 til ABA100.</p>
-      </section>
+        <button type="submit" id="aba-search-button">Søg</button>
+        <p class="aba-hint">
+          Søg efter ABA1 til ABA100. Tryk Enter eller på Søg.
+        </p>
+      </form>
 
       <section id="aba-result" class="aba-result" hidden>
         <h2 id="aba-name"></h2>
+        <p id="aba-location"></p>
 
         <div class="aba-status-row">
           <span>Nuværende status:</span>
           <strong id="aba-status"></strong>
         </div>
 
+        <p id="aba-phone-display" hidden></p>
+        <p id="aba-service-time-display" hidden></p>
+
         <button type="button" id="aba-toggle-status">Skift status</button>
+      </section>
+
+      <button type="button" id="show-service-list" class="aba-list-button">
+        Vis alle anlæg i service
+      </button>
+
+      <section id="aba-service-list" class="aba-service-list" hidden>
+        <h2>Anlæg i service</h2>
+        <p id="service-list-empty" hidden>Der er ingen anlæg i service.</p>
+
+        <div class="aba-table-wrapper">
+          <table id="service-table">
+            <thead>
+              <tr>
+                <th>ABA</th>
+                <th>Lokation</th>
+                <th>Status</th>
+                <th>Telefonnummer</th>
+                <th>Sat i service</th>
+              </tr>
+            </thead>
+            <tbody id="service-list-rows"></tbody>
+          </table>
+        </div>
       </section>
 
       <p id="aba-message" class="aba-message" aria-live="polite">
