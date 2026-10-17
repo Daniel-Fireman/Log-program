@@ -481,3 +481,220 @@ p {
     gap: 4px;
   }
 }
+
+/* =========================
+   Odin – hændelsesrapport
+   ========================= */
+
+.odin-page {
+  max-width: 1100px;
+  text-align: left;
+}
+
+.odin-page > h1,
+.odin-page > p {
+  text-align: center;
+}
+
+.odin-section {
+  margin-top: 30px;
+  padding: 24px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px #17255414;
+}
+
+.odin-section h2 {
+  margin-top: 0;
+  color: #2563eb;
+}
+
+#odin-form > .odin-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#odin-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 500;
+}
+
+#odin-form input,
+#odin-form textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #fff;
+  color: #1f2937;
+  font: inherit;
+}
+
+#odin-form textarea {
+  resize: vertical;
+}
+
+.odin-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+#vehicle-table {
+  width: 100%;
+  min-width: 700px;
+  border-collapse: collapse;
+  margin-bottom: 16px;
+}
+
+#vehicle-table th,
+#vehicle-table td {
+  padding: 8px;
+  border: 1px solid #cbd5e1;
+  text-align: left;
+}
+
+#vehicle-table th {
+  background: #eff6ff;
+  color: #1e40af;
+}
+
+#vehicle-table .vehicle-input {
+  min-width: 95px;
+  padding: 8px;
+}
+
+#add-vehicle,
+.remove-vehicle,
+.pdf-button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  background: #2563eb;
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
+#add-vehicle:hover,
+.pdf-button:hover {
+  background: #1d4ed8;
+}
+
+.remove-vehicle {
+  background: #dc2626;
+}
+
+.remove-vehicle:hover {
+  background: #b91c1c;
+}
+
+.pdf-button {
+  display: block;
+  margin: 24px auto;
+  padding: 14px 22px;
+  font-weight: bold;
+}
+
+@media (max-width: 600px) {
+  .odin-section {
+    padding: 14px;
+  }
+}
+
+/* Odin: større hændelsesforløb */
+#incident-course {
+  min-height: 260px;
+  width: 100%;
+  resize: vertical;
+}
+
+/* Odin: dato- og tidsfelter i køretøjstabellen */
+#vehicle-table .vehicle-input[type="datetime-local"] {
+  min-width: 190px;
+}
+
+/* Gør hændelsesoplysningerne mere luftige */
+.odin-page .odin-section {
+  margin-bottom: 24px;
+}
+
+/* Downloadknappen nederst */
+#download-pdf {
+  margin-top: 30px;
+  margin-bottom: 40px;
+}
+
+.odin-bottom-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin: 30px 0 40px;
+}
+
+.odin-bottom-buttons .pdf-button {
+  margin: 0;
+}
+
+.clear-button {
+  padding: 14px 22px;
+  border: none;
+  border-radius: 6px;
+  background: #dc2626;
+  color: #fff;
+  font: inherit;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.clear-button:hover {
+  background: #b91c1c;
+}
+
+.odin-bottom-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.odin-bottom-buttons .clear-button,
+.odin-bottom-buttons .pdf-button {
+  width: 260px;
+  min-height: 48px;
+  margin: 0;
+  padding: 14px 22px;
+  box-sizing: border-box;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Tving begge Odin-knapper til præcis samme størrelse */
+.odin-bottom-buttons > #clear-odin,
+.odin-bottom-buttons > #download-pdf {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 260px;
+  height: 48px;
+  min-height: 48px;
+  box-sizing: border-box;
+
+  margin: 0;
+  padding: 0 12px;
+
+  border: none;
+  border-radius: 6px;
+
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: normal;
+  text-align: center;
+}
