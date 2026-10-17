@@ -1,9 +1,24 @@
 const vehicleRows = document.getElementById("vehicle-rows");
 const addVehicleButton = document.getElementById("add-vehicle");
 const downloadButton = document.getElementById("download-pdf");
+const clearButton = document.getElementById("clear-odin");
+const form = document.getElementById("odin-form");
 
-// Opret en ny køretøjsrække.
-function addVehicleRow() {
+const storageKey = "odin-report";
+
+/* =========================
+   Hent værdier fra felter
+   ========================= */
+
+function getValue(id) {
+  return document.getElementById(id).value.trim();
+}
+
+/* =========================
+   Køretøjer
+   ========================= */
+
+function addVehicleRow(savedValues = []) {
   const row = document.createElement("tr");
 
   const fields = [
@@ -15,13 +30,15 @@ function addVehicleRow() {
     { type: "datetime-local", label: "Hjem" },
   ];
 
-  fields.forEach((field) => {
+  fields.forEach((field, index) => {
     const cell = document.createElement("td");
     const input = document.createElement("input");
 
     input.type = field.type;
     input.className = "vehicle-input";
     input.setAttribute("aria-label", field.label);
+
+    input.value = savedValues[index] || "";
 
     if (field.type === "text") {
       input.placeholder = field.label;
@@ -31,34 +48,140 @@ function addVehicleRow() {
     row.appendChild(cell);
   });
 
+  // Handlinger for rækken.
   const actionCell = document.createElement("td");
   actionCell.className = "no-pdf";
 
   const removeButton = document.createElement("button");
+
   removeButton.type = "button";
   removeButton.textContent = "Slet";
   removeButton.className = "remove-vehicle";
 
   removeButton.addEventListener("click", () => {
     row.remove();
+    saveOdinData();
   });
 
   actionCell.appendChild(removeButton);
   row.appendChild(actionCell);
 
   vehicleRows.appendChild(row);
+
+  return row;
 }
 
-addVehicleButton.addEventListener("click", addVehicleRow);
+// Tilføj et køretøj.
+addVehicleButton.addEventListener("click", () => {
+  addVehicleRow();
+  saveOdinData();
+});
 
-// Start med én tom køretøjsrække.
-addVehicleRow();
+/* =========================
+   Gem data
+   ========================= */
 
-function getValue(id) {
-  return document.getElementById(id).value.trim();
+function saveOdinData() {
+  const data = {
+    firstMessage: getValue("first-message"),
+    alarmTime: getValue("alarm-time"),
+    caller: getValue("caller"),
+    callerPhone: getValue("caller-phone"),
+    address: getValue("address"),
+    incidentCourse: getValue("incident-course"),
+
+    vehicles: Array.from(vehicleRows.querySelectorAll("tr")).map((row) =>
+      Array.from(row.querySelectorAll("input")).map((input) => input.value),
+    ),
+  };
+
+  try {
+    localStorage.setItem(storageKey, JSON.stringify(data));
+  } catch (error) {
+    console.error("Kunne ikke gemme Odin-data:", error);
+  }
 }
 
-// Konverterer dato og tid til dansk format.
+/* =========================
+   Indlæs gemte data
+   ========================= */
+
+function loadOdinData() {
+  let data = null;
+
+  try {
+    const savedData = localStorage.getItem(storageKey);
+    data = savedData ? JSON.parse(savedData) : null;
+  } catch (error) {
+    console.error("Kunne ikke indlæse Odin-data:", error);
+  }
+
+  if (data && typeof data === "object") {
+    document.getElementById("first-message").value = data.firstMessage || "";
+
+    document.getElementById("alarm-time").value = data.alarmTime || "";
+
+    document.getElementById("caller").value = data.caller || "";
+
+    document.getElementById("caller-phone").value = data.callerPhone || "";
+
+    document.getElementById("address").value = data.address || "";
+
+    document.getElementById("incident-course").value =
+      data.incidentCourse || "";
+
+    // Genskab de gemte køretøjer.
+    if (Array.isArray(data.vehicles) && data.vehicles.length > 0) {
+      data.vehicles.forEach((vehicle) => {
+        addVehicleRow(Array.isArray(vehicle) ? vehicle : []);
+      });
+    } else {
+      addVehicleRow();
+    }
+  } else {
+    // Opret en tom række, hvis der ikke findes gemte data.
+    addVehicleRow();
+  }
+}
+
+/* =========================
+   Automatisk lagring
+   ========================= */
+
+// Gem, når brugeren skriver eller ændrer et felt.
+form.addEventListener("input", saveOdinData);
+form.addEventListener("change", saveOdinData);
+
+/* =========================
+   Ryd alt indhold
+   ========================= */
+
+clearButton.addEventListener("click", () => {
+  const confirmed = confirm(
+    "Er du sikker på, at du vil rydde alle oplysninger og køretøjer? Dette kan ikke fortrydes.",
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  // Ryd hændelsesoplysningerne.
+  form.reset();
+
+  // Fjern alle køretøjsrækker.
+  vehicleRows.replaceChildren();
+
+  // Opret én ny, tom køretøjsrække.
+  addVehicleRow();
+
+  // Gem den tomme rapport.
+  saveOdinData();
+});
+
+/* =========================
+   Dansk datoformat
+   ========================= */
+
 function formatDanishDateTime(value) {
   if (!value) {
     return "-";
@@ -76,8 +199,11 @@ function formatDanishDateTime(value) {
   return `${day}-${month}-${year} kl. ${time}`;
 }
 
-// Tegner et felt med label og værdi i PDF'en.
-function drawField(pdf, label, value, x, y, width) {
+/* =========================
+   PDF-hjælpefunktion
+   ========================= */
+
+function drawInfoBox(pdf, label, value, x, y, width) {
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(10);
   pdf.text(label, x, y);
@@ -86,12 +212,16 @@ function drawField(pdf, label, value, x, y, width) {
   pdf.setFontSize(11);
 
   const lines = pdf.splitTextToSize(value || "-", width - 4);
+
   pdf.text(lines, x, y + 6);
 
-  return lines.length;
+  return Math.max(12, lines.length * 5 + 8);
 }
 
-// Download rapporten som en A3-PDF.
+/* =========================
+   Download A3-PDF
+   ========================= */
+
 downloadButton.addEventListener("click", () => {
   if (!window.jspdf || !window.jspdf.jsPDF) {
     alert(
@@ -109,11 +239,10 @@ downloadButton.addEventListener("click", () => {
   });
 
   const pageWidth = pdf.internal.pageSize.getWidth();
-  const pageHeight = pdf.internal.pageSize.getHeight();
   const margin = 12;
   const contentWidth = pageWidth - margin * 2;
 
-  // Titel øverst.
+  // Titel.
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(22);
   pdf.text("ODIN - HÆNDELSESRAPPORT", margin, 18);
@@ -125,25 +254,12 @@ downloadButton.addEventListener("click", () => {
   // Hændelsesoplysninger i to kolonner.
   const columnGap = 12;
   const columnWidth = (contentWidth - columnGap) / 2;
+
   const leftX = margin;
   const rightX = margin + columnWidth + columnGap;
 
-  function drawInfoBox(label, value, x, y, width) {
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(10);
-    pdf.text(label, x, y);
-
-    pdf.setFont("helvetica", "normal");
-    pdf.setFontSize(11);
-
-    const lines = pdf.splitTextToSize(value || "-", width - 4);
-    pdf.text(lines, x, y + 6);
-
-    return Math.max(12, lines.length * 5 + 8);
-  }
-
-  // Første række med oplysninger.
   drawInfoBox(
+    pdf,
     "Førstemelding",
     getValue("first-message"),
     leftX,
@@ -152,6 +268,7 @@ downloadButton.addEventListener("click", () => {
   );
 
   drawInfoBox(
+    pdf,
     "Alarm modtaget",
     formatDanishDateTime(getValue("alarm-time")),
     rightX,
@@ -159,10 +276,10 @@ downloadButton.addEventListener("click", () => {
     columnWidth,
   );
 
-  // Anden række.
-  drawInfoBox("Anmelder", getValue("caller"), leftX, 52, columnWidth);
+  drawInfoBox(pdf, "Anmelder", getValue("caller"), leftX, 52, columnWidth);
 
   drawInfoBox(
+    pdf,
     "Anmelder telefon",
     getValue("caller-phone"),
     rightX,
@@ -170,8 +287,7 @@ downloadButton.addEventListener("click", () => {
     columnWidth,
   );
 
-  // Adresse på sin egen række.
-  drawInfoBox("Adresse", getValue("address"), leftX, 72, contentWidth);
+  drawInfoBox(pdf, "Adresse", getValue("address"), leftX, 72, contentWidth);
 
   // Stort felt til hændelsesforløb.
   const courseTop = 91;
@@ -185,6 +301,7 @@ downloadButton.addEventListener("click", () => {
 
   pdf.setDrawColor(148, 163, 184);
   pdf.setLineWidth(0.3);
+
   pdf.rect(margin, courseTop + 4, contentWidth, courseHeight - 4);
 
   const course = getValue("incident-course") || "-";
@@ -193,7 +310,7 @@ downloadButton.addEventListener("click", () => {
   const textWidth = contentWidth - 8;
   const availableTextHeight = courseHeight - 16;
 
-  // Tilpas skriftstørrelsen, så teksten udnytter feltet.
+  // Tilpas skriftstørrelsen efter mængden af tekst.
   let fontSize = 11;
   let courseLines = [];
 
@@ -214,11 +331,12 @@ downloadButton.addEventListener("click", () => {
 
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(fontSize);
+
   pdf.text(courseLines, textX, textY, {
     lineHeightFactor: 1.25,
   });
 
-  // Køretøjstabel ved bunden af A3-siden.
+  // Hent alle køretøjer og deres tidspunkter.
   const rows = Array.from(vehicleRows.querySelectorAll("tr")).map((row) => {
     const inputs = Array.from(row.querySelectorAll("input"));
 
@@ -229,7 +347,7 @@ downloadButton.addEventListener("click", () => {
         return "-";
       }
 
-      // Første felt er køretøjets navn.
+      // Første kolonne indeholder køretøjets navn.
       if (index === 0) {
         return value;
       }
@@ -238,16 +356,22 @@ downloadButton.addEventListener("click", () => {
     });
   });
 
+  // Køretøjstabel ved bunden af A3-siden.
   pdf.autoTable({
     startY: tableTop,
+
     head: [["Køretøj", "Disponeret", "Afgang", "Ankomst", "Fri", "Hjem"]],
+
     body: rows,
+
     theme: "grid",
+
     margin: {
       left: margin,
       right: margin,
       bottom: 10,
     },
+
     styles: {
       font: "helvetica",
       fontSize: 9,
@@ -255,11 +379,13 @@ downloadButton.addEventListener("click", () => {
       overflow: "linebreak",
       valign: "middle",
     },
+
     headStyles: {
       fontStyle: "bold",
       fillColor: [37, 99, 235],
       textColor: [255, 255, 255],
     },
+
     columnStyles: {
       0: { cellWidth: 70 },
       1: { cellWidth: "auto" },
@@ -268,9 +394,16 @@ downloadButton.addEventListener("click", () => {
       4: { cellWidth: "auto" },
       5: { cellWidth: "auto" },
     },
+
     rowPageBreak: "avoid",
   });
 
-  // Download.
   pdf.save("Odin-haendelsesrapport.pdf");
 });
+
+/* =========================
+   Start Odin
+   ========================= */
+
+// Indlæs gemte oplysninger, når siden åbnes.
+loadOdinData();
