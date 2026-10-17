@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="da">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Odin – Hændelsesrapport</title>
+
+    <link rel="stylesheet" href="styles.css" />
+
+    <!-- Biblioteker til at generere PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
+
+    <script src="odin.js" defer></script>
+  </head>
+
+  <body>
+    <nav class="navbar" aria-label="Hovednavigation">
+      <a class="brand" href="index.html">Junior døgnøvelse</a>
+
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="log.html">Log</a></li>
+        <li><a href="odin.html">Odin</a></li>
+      </ul>
+    </nav>
+
+    <main class="odin-page">
+      <h1>Odin</h1>
+      <p>Hændelsesrapport og køretøjsoversigt</p>
+
+      <form id="odin-form">
+        <section class="odin-section">
+          <h2>Hændelsesoplysninger</h2>
+
+          <label for="first-message">Førstemelding</label>
+          <input
+            type="text"
+            id="first-message"
+            placeholder="Indtast førstemelding"
+          />
+
+          <label for="alarm-time">Alarm modtaget</label>
+          <input type="datetime-local" id="alarm-time" />
+
+          <label for="caller">Anmelder</label>
+          <input type="text" id="caller" placeholder="Navn på anmelder" />
+
+          <label for="caller-phone">Anmelder telefon</label>
+          <input type="tel" id="caller-phone" placeholder="Telefonnummer" />
+
+          <label for="address">Adresse</label>
+          <input type="text" id="address" placeholder="Hændelsens adresse" />
+
+          <label for="incident-course">Hændelsesforløb</label>
+          <textarea
+            id="incident-course"
+            rows="10"
+            placeholder="Beskriv hændelsesforløbet..."
+          ></textarea>
+        </section>
+
+        <section class="odin-section">
+          <h2>Køretøjer</h2>
+
+          <div class="odin-table-wrapper">
+            <table id="vehicle-table">
+              <thead>
+                <tr>
+                  <th>Køretøj</th>
+                  <th>Disponeret</th>
+                  <th>Afgang</th>
+                  <th>Ankomst</th>
+                  <th>Fri</th>
+                  <th>Hjem</th>
+                  <th class="no-pdf">Handling</th>
+                </tr>
+              </thead>
+
+              <tbody id="vehicle-rows"></tbody>
+            </table>
+          </div>
+
+          <button type="button" id="add-vehicle">+ Tilføj køretøj</button>
+        </section>
+
+        <button type="button" id="download-pdf" class="pdf-button">
+          Download rapport som A3-PDF
+        </button>
+      </form>
+    </main>
+  </body>
+</html>
