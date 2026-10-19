@@ -1065,3 +1065,46 @@ p {
 .tyv-log-card p {
   overflow-wrap: anywhere;
 }
+/* Lydknap til tyverialarmer */
+/* Lydknap til tyverialarmer */
+#tyverialarm-sound {
+  background-color: transparent;
+  color: inherit;
+  border: 1px solid #666;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: normal;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+#tyverialarm-sound:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+#tyverialarm-sound:active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+#tyverialarm-sound:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 2px;
+}
+
+/* Når lyden er aktiveret */
+#tyverialarm-sound.sound-enabled {
+  background-color: transparent;
+  border-color: #4ade80;
+  color: #4ade80;
+}
+
+#tyverialarm-sound.sound-enabled:hover {
+  background-color: rgba(74, 222, 128, 0.1);
+}
+
+#tyverialarm-sound:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 3px;
+}
